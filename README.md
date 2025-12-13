@@ -8,7 +8,7 @@ Get `localhost:8000/api/experiments` to view a list of current experiments.
 
 To run tests, run `docker compose exec fastapi pytest`
 
-To run an example run `python3 example.py`
+To run an example run `python example.py`
 
 ## Description
 
@@ -25,13 +25,6 @@ The second gives statistical information about the experiment including measured
 Caching happens on experiments and segments, so when a user needs to access their variant, the request is as fast as possible.
 
 I changed some of the endpoints slightly from the project definition, because I felt like these were more representative places for the application logic to go, and I added a few more endpoints than required.
-
-APIs are documented in APIDoc.md
-
-### Changes
-
-- I moved `GET /experiments/{id}/assignment/{user_id}` to `POST /experiments/check-eligibility`. The new endpoint accomodates making sure the user is in the experiment as well as getting the variant.
-- I moved individual result data from `GET /experiments/{experiment_id}/results` to `GET /events/{event_id}`. This way individual event data is returned from the get event endpoint, and statistical data is returned from the experiments endpoint
 
 ### Experiment
 
@@ -53,7 +46,14 @@ A user is the actor being tested on. They are the ones specifically interacting 
 
 Lastly events are what's logged by users interacting with the application. They're used to create metrics about the experiment's efficacy.
 
+## Changes
+
+- I moved `GET /experiments/{id}/assignment/{user_id}` to `POST /experiments/check-eligibility`. The new endpoint accomodates making sure the user is in the experiment as well as getting the variant.
+- I moved individual result data from `GET /experiments/{experiment_id}/results` to `GET /events/{event_id}`. This way individual event data is returned from the get event endpoint, and statistical data is returned from the experiments endpoint
+
 ## Usage
+
+APIs are documented in APIDoc.md
 
 To get the variants applicable to a specific user once in a flow, call the `/check-eligibility` endpoint with all possible experiments in that workflow.
 

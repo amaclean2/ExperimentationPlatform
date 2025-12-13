@@ -213,7 +213,7 @@ Example: curl -X POST http://localhost:8000/api/experiments/check-eligibility \
 **Get experiment results**
 
 > [!NOTE]
-> To get individual data for an experiment, go to the section **Get Events**. Here is a basic output of standard statistical outputs from an experiment. To get more details, more requirements would have to be added.
+> To get individual data for an experiment, go to the section [Get Events](https://github.com/amaclean2/ExperimentationPlatform/blob/main/README.md#events-1). Here is a basic output of standard statistical outputs from an experiment. To get more details, more requirements would have to be added.
 
 ```
 POST localhost:8000/api/experiments/{experiment_id}/results

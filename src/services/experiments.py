@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
-from src.models import Experiment, Variant, ExperimentSegment, User, UserSegment
+from src.models import Experiment, Variant, ExperimentSegment, User, UserSegment, UserVariantAssignment
 from src.schemas.experiments import (
     ExperimentCreate, VariantCreate, VariantUpdate,
     EligibilityCheckRequest, ExperimentVariantInfo
@@ -164,6 +164,20 @@ async def check_user_eligibility(
     eligible_experiments = {}
 
     for experiment_id in request.experiment_ids:
+        # Check if user already has an assignment for this experiment
+        result = await db.execute(
+            select(UserVariantAssignment).filter(
+                UserVariantAssignment.user_id == request.user_id,
+                UserVariantAssignment.experiment_id == experiment_id
+            )
+        )
+        existing_assignment = result.scalar_one_or_none()
+
+        if existing_assignment:
+            # User already assigned, return existing assignment
+            eligible_experiments[experiment_id] = ExperimentVariantInfo(variant_id=existing_assignment.variant_id)
+            continue
+
         result = await db.execute(
             select(Experiment)
             .options(selectinload(Experiment.variants))
@@ -183,6 +197,13 @@ async def check_user_eligibility(
         if not experiment_segments:
             variant_id = assign_variant_by_hash(request.user_id, experiment_id, experiment.variants)
             if variant_id:
+                # Create persistent assignment
+                assignment = UserVariantAssignment(
+                    user_id=request.user_id,
+                    experiment_id=experiment_id,
+                    variant_id=variant_id
+                )
+                db.add(assignment)
                 eligible_experiments[experiment_id] = ExperimentVariantInfo(variant_id=variant_id)
             continue
 
@@ -210,6 +231,16 @@ async def check_user_eligibility(
         if is_eligible:
             variant_id = assign_variant_by_hash(request.user_id, experiment_id, experiment.variants)
             if variant_id:
+                # Create persistent assignment
+                assignment = UserVariantAssignment(
+                    user_id=request.user_id,
+                    experiment_id=experiment_id,
+                    variant_id=variant_id
+                )
+                db.add(assignment)
                 eligible_experiments[experiment_id] = ExperimentVariantInfo(variant_id=variant_id)
+
+    # Commit all new assignments
+    await db.commit()
 
     return eligible_experiments

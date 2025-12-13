@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from fastapi import HTTPException
-from src.models import Experiment, Variant, Event
+from src.models import Experiment, Variant, Event, UserVariantAssignment
 from src.schemas.statistics import VariantResult, ConfidenceInterval, ExperimentStatisticsResponse, Winner
 from typing import Dict, List
 import math
@@ -92,14 +92,19 @@ async def get_experiment_statistics(
 
     control_variant_data = None
     for variant in variants:
-        total_users_result = await db.execute(
-            select(func.count(func.distinct(Event.user_id)))
-            .filter(Event.variant_id == variant.id)
+        # Count total page_view events (sessions) for this variant
+        total_sessions_result = await db.execute(
+            select(func.count(Event.id))
+            .filter(
+                Event.variant_id == variant.id,
+                Event.type == "page_view"
+            )
         )
-        total_users = total_users_result.scalar() or 0
+        total_sessions = total_sessions_result.scalar() or 0
 
+        # Count conversion events
         conversions_result = await db.execute(
-            select(func.count(func.distinct(Event.user_id)))
+            select(func.count(Event.id))
             .filter(
                 Event.variant_id == variant.id,
                 Event.type == conversion_event_type
@@ -107,14 +112,14 @@ async def get_experiment_statistics(
         )
         conversions = conversions_result.scalar() or 0
 
-        conversion_rate = (conversions / total_users * 100) if total_users > 0 else 0.0
+        conversion_rate = (conversions / total_sessions * 100) if total_sessions > 0 else 0.0
 
         is_control = variant.name.lower() == "control"
 
         data = {
             "variant_id": variant.id,
             "variant_name": variant.name,
-            "total_users": total_users,
+            "total_users": total_sessions,
             "conversions": conversions,
             "conversion_rate": conversion_rate,
             "is_control": is_control

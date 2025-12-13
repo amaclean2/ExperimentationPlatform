@@ -46,7 +46,7 @@ async def test_experiment_statistics_basic(client: AsyncClient):
         "user_id": user1_id,
         "experiment_id": experiment_id,
         "variant_id": control_variant_id,
-        "type": "view"
+        "type": "page_view"
     })
 
     await client.post("/api/events/", json={
@@ -60,7 +60,7 @@ async def test_experiment_statistics_basic(client: AsyncClient):
         "user_id": user2_id,
         "experiment_id": experiment_id,
         "variant_id": variant_a["id"],
-        "type": "view"
+        "type": "page_view"
     })
 
     stats_response = await client.post(
@@ -128,7 +128,7 @@ async def test_statistical_significance(client: AsyncClient):
             "user_id": user_id,
             "experiment_id": experiment_id,
             "variant_id": control_variant_id,
-            "type": "view"
+            "type": "page_view"
         })
 
         if i < 5:
@@ -151,7 +151,7 @@ async def test_statistical_significance(client: AsyncClient):
             "user_id": user_id,
             "experiment_id": experiment_id,
             "variant_id": treatment_variant["id"],
-            "type": "view"
+            "type": "page_view"
         })
 
         if i < 8:

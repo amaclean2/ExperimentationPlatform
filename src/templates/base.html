@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Experimentation Engine{% endblock %}</title>
+  </head>
+  <body>
+    <div class="layout">
+      <header>
+        <img
+          src="https://framerusercontent.com/images/mCJj5Sli8zqHxadWVhNdkXWX4.png"
+          alt="Neon Blue"
+        />
+      </header>
+      <div class="body-content">
+        <aside class="sidebar">
+          <nav class="sidebar-nav">
+            <ul>
+              <li>
+                <a href="/ui/experiments" class="nav-link">Experiments</a>
+              </li>
+              <li><a href="/ui/segments" class="nav-link">Segments</a></li>
+              <li><a href="/ui/users" class="nav-link">Users</a></li>
+              <li><a href="/ui/events" class="nav-link">Events</a></li>
+            </ul>
+          </nav>
+          {% block sidebar_extra %}{% endblock %}
+        </aside>
+        <main class="main-content">{% block content %}{% endblock %}</main>
+      </div>
+    </div>
+  </body>
+</html>

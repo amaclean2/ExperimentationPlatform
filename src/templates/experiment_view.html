@@ -1,0 +1,163 @@
+{% extends "base.html" %} {% block title %}{{ experiment.name if experiment else
+'Experiment' }}{% endblock %} {% block content %} {% if experiment %}
+<div class="experiment-detail">
+  <!-- Header with Back Button -->
+  <div class="detail-header">
+    <a href="/ui/experiments" class="back-button">&larr; Back to Experiments</a>
+    <div style="flex: 1"></div>
+      <div class="actions-section">
+    <a href="/ui/experiment/{{ experiment.id }}/edit" class="button"
+      >Edit</a
+    >
+    <a href="/ui/experiment/{{ experiment.id }}/variants/new" class="button"
+      >Add Segment</a
+    >
+  </div>
+  </div>
+
+  <!-- Experiment Title and Status -->
+  <div class="experiment-title-section">
+    <h1>{{ experiment.name }}</h1>
+    <div class="pill status {{ experiment.status }}">
+      {{ experiment.status }}
+    </div>
+  </div>
+
+  <!-- Experiment Description -->
+  <p class="experiment-description">
+    {{ experiment.description or 'No description provided' }}
+  </p>
+
+  <!-- Metadata Section -->
+  <div class="metadata-section">
+      <span class="experiment-date">
+        Created: {{ experiment.created_at_formatted }}
+      </span>
+    </div>
+    {% if experiment.started_at_formatted %}
+    <div class="metadata-item">
+      <span class="metadata-label">Started:</span>
+      <span class="metadata-value">{{ experiment.started_at_formatted }}</span>
+    </div>
+    {% endif %} {% if experiment.ended_at_formatted %}
+    <div class="metadata-item">
+      <span class="metadata-label">Ended:</span>
+      <span class="metadata-value">{{ experiment.ended_at_formatted }}</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Variants Section -->
+  <div class="section">
+    <button class="button variant-add">
+    <a href="/ui/experiment/{{ experiment.id }}/variants/new" class="variant-add"
+      >Add Variant</a
+    >
+    </button>
+    {% if experiment.variants %}
+    <div class="variants-grid">
+      {% for variant in experiment.variants %}
+      <div class="variant-card">
+        <div class="variant-header">
+          <h3>{{ variant.name }}</h3>
+        </div>
+        <div class="variant-allocation">
+          <div class="allocation-label">Traffic Allocation</div>
+          <div class="allocation-value">
+            {{ "%.1f"|format(variant.percent_allocated) }}%
+          </div>
+          <div class="allocation-bar">
+            <div
+              class="allocation-fill"
+              style="width: {{ variant.percent_allocated }}%"
+            ></div>
+          </div>
+        </div>
+        <p class="variant-date">Created: {{ variant.created_at_formatted }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No variants configured</p>
+    {% endif %}
+  </div>
+
+  <!-- Segments Section -->
+  <div class="section">
+    <h2>Segments</h2>
+    {% if experiment.segments %}
+    <div class="segments-list">
+      {% for segment in experiment.segments %}
+      <div class="segment-item">
+        <h4>{{ segment.name }}</h4>
+        {% if segment.description %}
+        <p>{{ segment.description }}</p>
+        {% endif %} {% if segment.rules %}
+        <div class="segment-rules">
+          <strong>Rules:</strong>
+          <code>{{ segment.rules }}</code>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No segments assigned</p>
+    {% endif %}
+  </div>
+
+  <!-- Code Integration Section -->
+  <div class="section">
+    <h2>Integration Code</h2>
+
+    <div class="code-snippet-container">
+      <h4>Get User's Variant Assignment</h4>
+      <pre class="code-snippet"><code>POST /api/experiments/check-eligibility
+Headers:
+  Authorization: `Bearer your_api_key`
+  Content-Type: application/json
+
+Body:
+{
+  "user_id": 123,
+  "experiment_ids": [{{ experiment.id }}]
+}
+
+Response:
+{
+  "eligible_experiment_ids": {
+    "{{ experiment.id }}": {
+      "variant_id": 1
+    }
+  }
+}</code></pre>
+    </div>
+
+    <div class="code-snippet-container">
+      <h4>Track an Event for this Experiment</h4>
+      <pre class="code-snippet"><code>POST /api/events/
+Headers:
+  Authorization: `Bearer your_api_key`
+  Content-Type: application/json
+
+Body:
+{
+  "user_id": "user-123",
+  "experiment_id": {{ experiment.id }},
+  "variant_id": 1,
+  "type": "conversion",
+  "properties": {
+    "value": 100,
+    "currency": "USD"
+  }
+}</code></pre>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="error-state">
+  <h1>Experiment Not Found</h1>
+  <p>The experiment you're looking for doesn't exist or couldn't be loaded.</p>
+  <a href="/ui/experiments" class="button">Back to Experiments</a>
+</div>
+{% endif %} {% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %} {% block title %}Experiments{% endblock %} {% block
+content %}
+<h1>Experiments</h1>
+
+<div class="experiment-list">
+  <div class="button-section">
+    <button id="add-experiment-btn" class="add button">Add Experiment</button>
+  </div>
+
+  <!-- New Experiment Form (Hidden by default) -->
+  <div id="new-experiment-form" class="experiment-form" style="display: none">
+    <h3>New Experiment</h3>
+    <form id="experiment-form" method="POST" action="/ui/experiments">
+      <div class="form-group">
+        <label for="experiment-name">Name *</label>
+        <input
+          type="text"
+          id="experiment-name"
+          name="name"
+          required
+          placeholder="Enter experiment name"
+        />
+      </div>
+      <div class="form-group">
+        <label for="experiment-description">Description</label>
+        <textarea
+          id="experiment-description"
+          name="description"
+          placeholder="Enter description (optional)"
+        ></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="button button-primary">Create</button>
+        <button type="button" id="cancel-btn" class="button">Cancel</button>
+      </div>
+      <div id="form-error" class="form-error" style="display: none"></div>
+    </form>
+  </div>
+
+  <ul class="experiments-list">
+    {% for exp in experiments %}
+    <li class="experiment">
+      <a href="/ui/experiment/{{ exp.id }}" class="experiment-link">
+        <div class="experiment-header">
+          <h3>{{ exp.name }}</h3>
+          <div class="pill status {{ exp.status}}">{{ exp.status }}</div>
+        </div>
+        <p class="experiment-date">Created: {{ exp.created_at_formatted }}</p>
+        <p class="experiment-description">{{ exp.description }}</p>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<script>
+  const addBtn = document.getElementById('add-experiment-btn')
+  const cancelBtn = document.getElementById('cancel-btn')
+  const formContainer = document.getElementById('new-experiment-form')
+  const form = document.getElementById('experiment-form')
+  const formError = document.getElementById('form-error')
+
+  // Show form when "Add Experiment" is clicked
+  addBtn.addEventListener('click', () => {
+    formContainer.style.display = 'block'
+    addBtn.style.display = 'none'
+    document.getElementById('experiment-name').focus()
+  })
+
+  // Hide form when "Cancel" is clicked
+  cancelBtn.addEventListener('click', () => {
+    formContainer.style.display = 'none'
+    addBtn.style.display = 'inline-block'
+    form.reset()
+    formError.style.display = 'none'
+  })
+</script>
+{% endblock %}

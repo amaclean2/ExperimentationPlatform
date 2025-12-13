@@ -14,7 +14,7 @@ This implementation goes beyond the required endpoints prodivded in the project 
 
 There's a framework included for building user interface views to make it easier to manage experiments, but implementing that was taking too much work. Further efforts on that can be made later. Depending on integrations, this is probably the next most useful thing to finish. It enables a user to visually ingest the information about their experiments.
 
-There's two results endpoints, `GET events/`, and `GET /{experiment_id}/results`. The first enabled tracking event data related to an experiment in a way that can be output to a graph or other UI chart.
+There's two results endpoints, `GET events/`, and `GET /{experiment_id}/results`. The first enables tracking event data related to an experiment in a way that can be output to a graph or other UI chart.
 
 The second gives statistical information about the experiment including measured events, confidence levels, significance thresholds, and variant winners. More observations can be added as requirements change.
 
@@ -543,6 +543,35 @@ RESPONSE List[{
 }]
 
 Example: curl -X POST http://localhost:8000/api/events/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{"variant_id": 2, "event_types": ["click", "conversion"]}'
+```
+
+## Usage
+
+To get the variants applicable to a specific user once in a flow, call the `/check-eligibility` endpoint with all possible experiments in that workflow.
+
+```
+curl -X POST http://localhost:8000/api/experiments/check-eligibility \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{"user_id": "user_12345", "experiment_ids": [1, 2, 3]}'
+```
+
+This will return a dictionary with all the eligible experiments as keys, and objects as values containing the corresponding variant per the user. In the tested application, different workflows can be called depending on variant. In each flow, at the desired action, an event can be triggered.
+
+```
+curl -X POST http://localhost:8000/api/events \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{"user_id": "user_12345", "experiment_id": 1, "variant_id": 2, "type": "conversion", "properties": {"value": 99.99}}'
+```
+
+These events can then be accumulated and watched from the `GET /events` endpoint.
+
+```
+curl -X POST http://localhost:8000/api/events/1 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
   -d '{"variant_id": 2, "event_types": ["click", "conversion"]}'

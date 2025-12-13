@@ -2,7 +2,9 @@
 
 ## Get started
 
-Clone this repo and run `docker compose up --build` to build and launch the application. Get `localhost:8000/api/experiments` to view a list of current experiments.
+Clone this repo and run `docker compose up --build` to build and launch the application.
+
+Get `localhost:8000/api/experiments` to view a list of current experiments.
 
 To run tests, run `docker compose exec fastapi pytest`
 

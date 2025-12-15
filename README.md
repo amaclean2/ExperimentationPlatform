@@ -24,7 +24,7 @@ The second gives statistical information about the experiment including measured
 
 Caching happens on experiments and segments, so when a user needs to access their variant, the request is as fast as possible.
 
-I changed some of the endpoints slightly from the project definition, because I felt like these were more representative places for the application logic to go, and I added a few more endpoints than required.
+Variants have an `enabled` boolean so a variant could be turned on or off from the api.
 
 ### Experiment
 

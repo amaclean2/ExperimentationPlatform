@@ -68,6 +68,7 @@ class Variant(Base):
     experiment_id = Column(Integer, ForeignKey("experiments.id"), nullable=False)
     name = Column(String, nullable=False)
     percent_allocated = Column(Float, nullable=False, default=0.0)
+    enabled = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     experiment = relationship("Experiment", back_populates="variants")

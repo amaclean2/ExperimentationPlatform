@@ -139,6 +139,9 @@ async def update_variant(
             )
         variant.percent_allocated = variant_update.percent_allocated
 
+    if variant_update.enabled is not None:
+        variant.enabled = variant_update.enabled
+
     await db.commit()
     await db.refresh(variant)
 

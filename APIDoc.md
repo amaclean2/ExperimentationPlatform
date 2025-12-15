@@ -114,6 +114,7 @@ RESPONSE {
   experiment_id: int
   name: str
   percent_allocated: float
+  enabled: bool
   created_at: datetime
 }
 
@@ -130,12 +131,14 @@ PUT localhost:8000/api/experiments/{experiment_id}/variants/{variant_id}
 BODY {
   name: Optional[str] = None
   percent_allocated: Optional[float] = None
+  enabled: Optional[bool] = None
 }
 RESPONSE {
   id: int
   experiment_id: int
   name: str
   percent_allocated: float
+  enabled: bool
   created_at: datetime
 }
 
@@ -143,6 +146,11 @@ Example: curl -X PUT http://localhost:8000/api/experiments/1/variants/2 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
   -d '{"percent_allocated": 60.0}'
+
+Example (disable variant): curl -X PUT http://localhost:8000/api/experiments/1/variants/2 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{"enabled": false}'
 ```
 
 ### Check Experiment Eligibility and Get Variant

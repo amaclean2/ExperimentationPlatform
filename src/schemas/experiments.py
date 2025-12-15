@@ -12,6 +12,7 @@ class VariantCreate(BaseModel):
 class VariantUpdate(BaseModel):
     name: Optional[str] = None
     percent_allocated: Optional[float] = None
+    enabled: Optional[bool] = None
 
 
 class VariantResponse(BaseModel):
@@ -19,6 +20,7 @@ class VariantResponse(BaseModel):
     experiment_id: int
     name: str
     percent_allocated: float
+    enabled: bool
     created_at: datetime
 
     class Config:
